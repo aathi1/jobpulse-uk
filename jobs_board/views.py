@@ -3,7 +3,7 @@ from django.db.models import Count
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from .models import Job, Insight
-import json
+import json, os
 import requests
 
 
@@ -158,9 +158,11 @@ def cv_match(request):
             })
 
         try:
+            admin_key = os.getenv("ADMIN_API_KEY", "")
             response = requests.post(
                 'http://api:8000/ai/cv-match',
                 params={'cv_text': cv_text, 'limit': limit},
+                headers={'x-api-key': admin_key},
                 timeout=120
             )
             results = response.json().get('results', [])

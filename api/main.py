@@ -1,11 +1,12 @@
-from fastapi import FastAPI
-from sqlalchemy.orm import Session
-from pipeline.database import engine
-from pipeline.models import Base, Job
-import logging
-from pipeline.models import Base, Job, Insight
-from sqlalchemy import text
 import json
+import logging
+import os
+
+from fastapi import FastAPI, Depends, HTTPException, Header
+from sqlalchemy.orm import Session
+
+from pipeline.database import engine
+from pipeline.models import Base, Job, Insight
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,16 +15,26 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="JobPulse UK", version="1.0.0")
 
+# ── Admin API Key Protection ───────────────────────────────────────────────────
+
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", "")
+
+def verify_admin(x_api_key: str = Header(None)):
+    """Protect AI endpoints — only admin can trigger Claude calls."""
+    if not x_api_key or x_api_key != ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized — admin key required")
+
+# ── Health ─────────────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
     return {"status": "JobPulse is running"}
 
-
 @app.get("/health")
 def health():
     return {"status": "healthy"}
 
+# ── Pipeline ───────────────────────────────────────────────────────────────────
 
 @app.post("/pipeline/run")
 def run_pipeline():
@@ -34,7 +45,6 @@ def run_pipeline():
         "status": "Pipeline task queued",
         "task_id": task.id,
     }
-
 
 @app.get("/pipeline/status/{task_id}")
 def pipeline_status(task_id: str):
@@ -47,6 +57,7 @@ def pipeline_status(task_id: str):
         "result": task.result if task.ready() else None,
     }
 
+# ── Jobs ───────────────────────────────────────────────────────────────────────
 
 @app.get("/jobs")
 def get_jobs(limit: int = 50, source: str = None):
@@ -71,7 +82,6 @@ def get_jobs(limit: int = 50, source: str = None):
             for j in jobs
         ]
 
-
 @app.get("/jobs/count")
 def jobs_count():
     """Return total job count by source."""
@@ -81,7 +91,6 @@ def jobs_count():
         adzuna = session.query(Job).filter(Job.source == "adzuna").count()
         return {"total": total, "reed": reed, "adzuna": adzuna}
 
-
 @app.get("/jobs/search")
 def live_search(keyword: str, limit: int = 25):
     """Live search — calls Reed + Adzuna APIs directly for any keyword."""
@@ -89,16 +98,10 @@ def live_search(keyword: str, limit: int = 25):
     from pipeline.clean import clean_jobs
 
     all_jobs = []
-
-    # Search Reed
     reed_jobs = with_retry(search_reed, keyword, limit) or []
     all_jobs.extend(reed_jobs)
-
-    # Search Adzuna
     adzuna_jobs = with_retry(search_adzuna, keyword, limit) or []
     all_jobs.extend(adzuna_jobs)
-
-    # Clean results
     cleaned = clean_jobs(all_jobs)
 
     return {
@@ -106,16 +109,15 @@ def live_search(keyword: str, limit: int = 25):
         "total": len(cleaned),
         "results": cleaned
     }
-    
+
+# ── AI — Protected Endpoints ───────────────────────────────────────────────────
 
 @app.post("/ai/market-summary")
-def run_market_summary():
-    """Generate AI market summary from current job data."""
+def run_market_summary(admin=Depends(verify_admin)):
+    """Generate AI market summary — admin only."""
     from ai.analyser import generate_market_summary
-    from pipeline.models import Insight
 
     with Session(engine) as session:
-        # Get recent jobs
         jobs = session.query(Job).order_by(Job.created_at.desc()).limit(100).all()
         job_dicts = [
             {
@@ -129,18 +131,12 @@ def run_market_summary():
             for j in jobs
         ]
 
-    # Call Claude
     summary = generate_market_summary(job_dicts)
-
     if not summary:
         return {"error": "AI analysis failed"}
 
-    # Save to insights table
     with Session(engine) as session:
-        insight = Insight(
-            insight_type="market_summary",
-            content=summary
-        )
+        insight = Insight(insight_type="market_summary", content=summary)
         session.add(insight)
         session.commit()
 
@@ -148,8 +144,8 @@ def run_market_summary():
 
 
 @app.post("/ai/extract-skills")
-def run_skill_extraction():
-    """Extract top skills from job descriptions using AI."""
+def run_skill_extraction(admin=Depends(verify_admin)):
+    """Extract top skills from job descriptions — admin only."""
     from ai.analyser import extract_skills_from_jobs
 
     with Session(engine) as session:
@@ -157,14 +153,11 @@ def run_skill_extraction():
         job_dicts = [{"description": j.description} for j in jobs]
 
     skills = extract_skills_from_jobs(job_dicts)
-
     if not skills:
         return {"error": "Skill extraction failed"}
 
-    # Sort by frequency
     sorted_skills = dict(sorted(skills.items(), key=lambda x: x[1], reverse=True))
 
-    # Save to insights
     with Session(engine) as session:
         insight = Insight(
             insight_type="skill_trends",
@@ -177,8 +170,8 @@ def run_skill_extraction():
 
 
 @app.post("/ai/cv-match")
-def cv_match(cv_text: str, limit: int = 10):
-    """Score CV against top jobs."""
+def cv_match(cv_text: str, limit: int = 10, admin=Depends(verify_admin)):
+    """Score CV against top jobs — admin only."""
     from ai.analyser import score_cv_against_job
 
     with Session(engine) as session:
@@ -201,14 +194,13 @@ def cv_match(cv_text: str, limit: int = 10):
         score["company"] = job["company"]
         results.append(score)
 
-    # Sort by score descending
     results.sort(key=lambda x: x.get("score", 0), reverse=True)
     return {"results": results}
 
 
 @app.get("/ai/latest-summary")
 def latest_summary():
-    """Get the most recent market summary."""
+    """Get the most recent market summary — public read only."""
     with Session(engine) as session:
         insight = (
             session.query(Insight)
@@ -217,5 +209,5 @@ def latest_summary():
             .first()
         )
         if not insight:
-            return {"summary": "No analysis run yet. Hit POST /ai/market-summary first."}
+            return {"summary": "No analysis run yet."}
         return {"summary": insight.content, "generated_at": str(insight.created_at)}
