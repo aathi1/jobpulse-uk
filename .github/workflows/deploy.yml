@@ -96,6 +96,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.AWS_KEY }}
+          command_timeout: 30m
           script: |
             cd ~/jobpulse2
             git pull origin main
