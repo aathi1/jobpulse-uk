@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPulse UK — Live Job Market Intelligence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; }
+
+        /* Header */
+        .header { background: #ffffff; padding: 0 40px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .logo { font-size: 20px; font-weight: 800; color: #0ea5e9; }
+        .logo span { color: #64748b; font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .nav a { color: #64748b; text-decoration: none; margin-left: 24px; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 6px; }
+        .nav a:hover { background: #f1f5f9; color: #0ea5e9; }
+        .nav a.active { background: #e0f2fe; color: #0ea5e9; }
+        .live { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #22c55e; font-weight: 600; }
+        .live::before { content: '●'; }
+
+
+        /* Search bar */
+        .search-bar { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 16px 40px; display: flex; gap: 12px; align-items: center; }
+        .search-input { flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #f8fafc; color: #1e293b; }
+        .search-input:focus { outline: none; border-color: #0ea5e9; background: #ffffff; }
+        .search-select { padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #f8fafc; color: #1e293b; }
+        .search-btn { background: #0ea5e9; color: #ffffff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .search-btn:hover { background: #0284c7; }
+        .clear-btn { background: #f1f5f9; color: #64748b; border: none; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+
+        /* Layout */
+        .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 120px); }
+
+        /* Sidebar */
+        .sidebar { background: #ffffff; border-right: 1px solid #e2e8f0; padding: 24px 20px; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+        .filter-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #334155; text-decoration: none; transition: all 0.15s; }
+        .filter-item:hover { background: #f0f9ff; color: #0ea5e9; }
+        .filter-item.active { background: #e0f2fe; color: #0ea5e9; font-weight: 600; }
+        .filter-count { background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .filter-item.active .filter-count { background: #bae6fd; color: #0369a1; }
+
+        .salary-inputs { display: flex; gap: 8px; margin-top: 8px; }
+        .salary-input { width: 100%; padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; background: #f8fafc; }
+        .salary-apply { width: 100%; background: #0ea5e9; color: white; border: none; padding: 7px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+
+        /* AI Summary in sidebar */
+        .ai-toggle { width: 100%; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 10px 12px; text-align: left; cursor: pointer; font-size: 13px; color: #0369a1; font-weight: 600; display: flex; justify-content: space-between; }
+        .ai-content { display: none; margin-top: 12px; font-size: 12px; color: #475569; line-height: 1.6; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+        .ai-content.open { display: block; }
+
+        /* Main content */
+        .main { padding: 24px 32px; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .results-count { font-size: 15px; font-weight: 600; color: #1e293b; }
+        .results-count span { color: #0ea5e9; }
+        .results-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+        /* Job cards */
+        .jobs-list { display: flex; flex-direction: column; gap: 10px; }
+        .job-card { background: #ffffff; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; transition: all 0.15s; cursor: pointer; }
+        .job-card:hover { border-color: #0ea5e9; box-shadow: 0 4px 12px rgba(14,165,233,0.08); transform: translateY(-1px); }
+        .job-card a { text-decoration: none; color: inherit; display: block; }
+        .job-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .job-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+        .job-company { color: #0ea5e9; font-size: 13px; font-weight: 500; margin-top: 3px; }
+        .job-salary { font-size: 14px; font-weight: 700; color: #16a34a; background: #f0fdf4; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+        .job-meta { display: flex; gap: 12px; font-size: 12px; color: #64748b; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.reed { background: #fef3c7; color: #d97706; }
+        .badge.adzuna { background: #ede9fe; color: #7c3aed; }
+        .job-location { display: flex; align-items: center; gap: 4px; }
+
+        /* No results */
+        .no-results { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .no-results h3 { font-size: 18px; margin-bottom: 8px; color: #64748b; }
+
+        /* Active filters */
+        .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .active-filter-tag { background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .active-filter-tag a { color: #0369a1; text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div style="display:flex; align-items:center; gap:16px;">
+        <div class="logo">⚡ JobPulse UK <span>Personal job market intelligence</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:24px;">
+    <nav class="nav">
+        <a href="/" class="active">Dashboard</a>
+        <a href="/search/">🔍 Live Search</a>
+        <a href="/cv-match/">🎯 CV Matcher</a>
+        <a href="/about/">👨‍💻 About</a>
+    </nav>
+        <div class="live">Live — updates every 6h</div>
+    </div>
+</div>
+
+<!-- Hero Banner -->
+<div style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%); padding: 40px; text-align: center;">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <h2 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 10px;">
+            Live UK Job Market Intelligence
+        </h2>
+        <p style="font-size: 15px; color: #bae6fd; line-height: 1.7; margin-bottom: 20px;">
+            JobPulse automatically tracks <strong style="color:#ffffff;">{{ total_jobs }}+ UK job postings</strong> across Python, engineering and German-speaking roles — updated every 6 hours. Powered by <strong style="color:#ffffff;">Reed</strong>, <strong style="color:#ffffff;">Adzuna</strong> and <strong style="color:#ffffff;">Claude AI</strong>.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="#jobs" style="background: #ffffff; color: #0369a1; padding: 10px 24px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 14px;">Browse Jobs ↓</a>
+            <a href="/cv-match/" style="background: #0284c7; color: #ffffff; padding: 10px 24px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 14px; border: 1px solid #38bdf8;">🎯 Match My CV</a>
+        </div>
+        <div style="display: flex; gap: 32px; justify-content: center; margin-top: 28px; flex-wrap: wrap;">
+            <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: 800; color: #ffffff;">{{ total_jobs }}+</div>
+                <div style="font-size: 12px; color: #bae6fd;">Live Jobs</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: 800; color: #ffffff;">2</div>
+                <div style="font-size: 12px; color: #bae6fd;">Job Sources</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: 800; color: #ffffff;">6h</div>
+                <div style="font-size: 12px; color: #bae6fd;">Update Cycle</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: 800; color: #ffffff;">AI</div>
+                <div style="font-size: 12px; color: #bae6fd;">Powered Analysis</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search bar -->
+<form method="GET" action="/">
+    <div class="search-bar">
+        <input class="search-input" type="text" name="keyword" placeholder="🔍  Search job titles e.g. Python, CATIA, Django..." value="{{ filters.keyword }}">
+        <select class="search-select" name="source">
+            <option value="">All Sources</option>
+            <option value="reed" {% if filters.source == 'reed' %}selected{% endif %}>Reed</option>
+            <option value="adzuna" {% if filters.source == 'adzuna' %}selected{% endif %}>Adzuna</option>
+        </select>
+        <input type="hidden" name="location" value="{{ filters.location }}">
+        <input type="hidden" name="company" value="{{ filters.company }}">
+        <input type="hidden" name="min_salary" value="{{ filters.min_salary }}">
+        <input type="hidden" name="max_salary" value="{{ filters.max_salary }}">
+        <button type="submit" class="search-btn">Search</button>
+        <a href="/" class="clear-btn">Clear</a>
+    </div>
+</form>
+
+<div class="layout" id="jobs">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        <!-- Stats -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Market Overview</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="background:#f0f9ff; border-radius:8px; padding:12px; text-align:center;">
+                    <div style="font-size:22px; font-weight:800; color:#0ea5e9;">{{ total_jobs }}</div>
+                    <div style="font-size:11px; color:#64748b;">Total Jobs</div>
+                </div>
+                <div style="background:#f0fdf4; border-radius:8px; padding:12px; text-align:center;">
+                    <div style="font-size:22px; font-weight:800; color:#16a34a;">{{ with_salary }}</div>
+                    <div style="font-size:11px; color:#64748b;">With Salary</div>
+                </div>
+                <div style="background:#fef3c7; border-radius:8px; padding:12px; text-align:center;">
+                    <div style="font-size:22px; font-weight:800; color:#d97706;">{{ reed_count }}</div>
+                    <div style="font-size:11px; color:#64748b;">Reed</div>
+                </div>
+                <div style="background:#ede9fe; border-radius:8px; padding:12px; text-align:center;">
+                    <div style="font-size:22px; font-weight:800; color:#7c3aed;">{{ adzuna_count }}</div>
+                    <div style="font-size:11px; color:#64748b;">Adzuna</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location filter -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Location</div>
+            {% for loc in top_locations %}
+            <a href="?location={{ loc.location }}&source={{ filters.source }}&keyword={{ filters.keyword }}"
+               class="filter-item {% if filters.location == loc.location %}active{% endif %}">
+                <span>{{ loc.location }}</span>
+                <span class="filter-count">{{ loc.count }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Source filter -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Source</div>
+            <a href="?source=reed&location={{ filters.location }}&keyword={{ filters.keyword }}"
+               class="filter-item {% if filters.source == 'reed' %}active{% endif %}">
+                <span>Reed</span>
+                <span class="filter-count">{{ reed_count }}</span>
+            </a>
+            <a href="?source=adzuna&location={{ filters.location }}&keyword={{ filters.keyword }}"
+               class="filter-item {% if filters.source == 'adzuna' %}active{% endif %}">
+                <span>Adzuna</span>
+                <span class="filter-count">{{ adzuna_count }}</span>
+            </a>
+        </div>
+
+        <!-- Company filter -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Top Companies</div>
+            {% for comp in top_companies %}
+            <a href="?company={{ comp.company }}&source={{ filters.source }}&keyword={{ filters.keyword }}"
+               class="filter-item {% if filters.company == comp.company %}active{% endif %}">
+                <span>{{ comp.company|truncatechars:22 }}</span>
+                <span class="filter-count">{{ comp.count }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Salary filter -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Salary Range (£)</div>
+            <form method="GET" action="/">
+                <input type="hidden" name="source" value="{{ filters.source }}">
+                <input type="hidden" name="location" value="{{ filters.location }}">
+                <input type="hidden" name="company" value="{{ filters.company }}">
+                <input type="hidden" name="keyword" value="{{ filters.keyword }}">
+                <div class="salary-inputs">
+                    <input class="salary-input" type="number" name="min_salary" placeholder="Min" value="{{ filters.min_salary }}">
+                    <input class="salary-input" type="number" name="max_salary" placeholder="Max" value="{{ filters.max_salary }}">
+                </div>
+                <button type="submit" class="salary-apply">Apply Salary Filter</button>
+            </form>
+        </div>
+
+        <!-- AI Summary -->
+        {% if latest_summary %}
+        <div class="sidebar-section">
+            <div class="sidebar-title">AI Market Intelligence</div>
+            <button class="ai-toggle" onclick="toggleAI(this)">
+                <span>🤖 Market Summary</span>
+                <span>▼</span>
+            </button>
+            <div class="ai-content">{{ latest_summary.content }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Skill trends -->
+        {% if skill_trends %}
+        <div class="sidebar-section">
+            <div class="sidebar-title">Top Skills In Demand</div>
+            {% for skill, count in skill_trends %}
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; font-size:13px;">
+                <span style="color:#334155;">{{ skill }}</span>
+                <span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600;">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+
+        <!-- Active filters -->
+        {% if filters.location or filters.company or filters.source or filters.keyword or filters.min_salary %}
+        <div class="active-filters">
+            <span style="font-size:13px; color:#64748b; align-self:center;">Filtered by:</span>
+            {% if filters.keyword %}<div class="active-filter-tag">🔍 {{ filters.keyword }} <a href="?source={{ filters.source }}&location={{ filters.location }}&company={{ filters.company }}">×</a></div>{% endif %}
+            {% if filters.location %}<div class="active-filter-tag">📍 {{ filters.location }} <a href="?source={{ filters.source }}&keyword={{ filters.keyword }}&company={{ filters.company }}">×</a></div>{% endif %}
+            {% if filters.company %}<div class="active-filter-tag">🏢 {{ filters.company }} <a href="?source={{ filters.source }}&keyword={{ filters.keyword }}&location={{ filters.location }}">×</a></div>{% endif %}
+            {% if filters.source %}<div class="active-filter-tag">{{ filters.source|upper }} <a href="?location={{ filters.location }}&keyword={{ filters.keyword }}&company={{ filters.company }}">×</a></div>{% endif %}
+            {% if filters.min_salary %}<div class="active-filter-tag">£{{ filters.min_salary }}+ <a href="?source={{ filters.source }}&location={{ filters.location }}&keyword={{ filters.keyword }}">×</a></div>{% endif %}
+            <a href="/" style="font-size:12px; color:#ef4444; text-decoration:none; font-weight:600; align-self:center;">Clear all</a>
+        </div>
+        {% endif %}
+
+        <!-- Results header -->
+        <div class="results-header">
+            <div>
+                <div class="results-count">
+                    <span>{{ filtered_count }}</span> jobs found
+                </div>
+                <div class="results-sub">Showing top 50 — updated every 6 hours</div>
+            </div>
+        </div>
+
+        <!-- Job cards -->
+        <div class="jobs-list">
+            {% for job in jobs %}
+            <div class="job-card">
+                <a href="/job/{{ job.id }}/">
+                    <div class="job-top">
+                        <div>
+                            <div class="job-title">{{ job.title }}</div>
+                            <div class="job-company">{{ job.company }}</div>
+                        </div>
+                        {% if job.salary_min %}
+                        <div class="job-salary">£{{ job.salary_min }} – £{{ job.salary_max }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="job-meta">
+                        <span class="job-location">📍 {{ job.location }}</span>
+                        <span class="badge {{ job.source }}">{{ job.source }}</span>
+                        <span>{{ job.date_posted }}</span>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="no-results">
+                <h3>No jobs found</h3>
+                <p>Try adjusting your filters or <a href="/" style="color:#0ea5e9;">clear all filters</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div style="background: #ffffff; border-top: 1px solid #e2e8f0; padding: 24px 40px; margin-top: 40px;">
+    <div style="max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <div style="font-size: 16px; font-weight: 800; color: #0ea5e9; margin-bottom: 6px;">⚡ JobPulse UK</div>
+            <div style="font-size: 12px; color: #94a3b8; line-height: 1.6; max-width: 400px;">
+                A portfolio project built with FastAPI, Django, PostgreSQL, Docker, Celery, Redis and Claude AI.
+                Job data is sourced from Reed and Adzuna APIs for personal and educational use only.
+            </div>
+        </div>
+        <div style="font-size: 12px; color: #94a3b8; line-height: 1.8; max-width: 400px; text-align: right;">
+            <strong style="color:#64748b;">Disclaimer</strong><br>
+            Job listings are sourced via Reed API and Adzuna API under their respective terms of service.
+            AI analysis is generated by Anthropic Claude and is for informational purposes only.
+            JobPulse is not affiliated with Reed, Adzuna or Anthropic.
+            Always verify job details directly on the source platform before applying.
+        </div>
+    </div>
+<!-- Required Adzuna Attribution -->
+<div style="text-align:center; margin-top: 16px;">
+    <a href="https://www.adzuna.co.uk" target="_blank" 
+       style="display:inline-flex; align-items:center; gap:8px; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 16px; border-radius:8px; text-decoration:none;">
+        <span style="font-size:13px; color:#64748b;">
+            <a href="https://www.adzuna.co.uk" target="_blank" 
+               style="color:#7c3aed; font-weight:700; text-decoration:none;">Jobs</a> 
+            by 
+            <a href="https://www.adzuna.co.uk" target="_blank" 
+               style="color:#7c3aed; font-weight:700; text-decoration:none;">
+                <img src="https://www.adzuna.co.uk/assets/images/adzuna-logo.png" 
+                     alt="Adzuna" 
+                     style="height:23px; width:116px; object-fit:contain; vertical-align:middle;">
+            </a>
+        </span>
+    </a>
+    <span style="font-size:11px; color:#94a3b8; margin-left:12px;">
+        Job data sourced from <a href="https://www.reed.co.uk" target="_blank" style="color:#d97706;">Reed.co.uk</a> 
+        and <a href="https://www.adzuna.co.uk" target="_blank" style="color:#7c3aed;">Adzuna</a> APIs
+    </span>
+</div>    
+    <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #cbd5e1;">
+        Built by Aathithyan Venkatesh · 2026 · 
+        <a href="https://github.com/aathi1/jobpulse-uk" target="_blank" style="color:#0ea5e9; text-decoration:none;">GitHub</a>
+        · Data updates every 6 hours · AI powered by Claude
+    </div>
+</div>
+
+<script>
+function toggleAI(btn) {
+    const content = btn.nextElementSibling;
+    content.classList.toggle('open');
+    btn.querySelector('span:last-child').textContent = content.classList.contains('open') ? '▲' : '▼';
+}
+</script>
+
+</body>
+</html>

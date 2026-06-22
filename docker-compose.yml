@@ -1,0 +1,97 @@
+services:
+
+  db:
+    image: postgres:15
+    container_name: jobpulse_db
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobpulse_user -d jobpulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: jobpulse_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: jobpulse_api
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build: .
+    container_name: jobpulse_worker
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A workers.tasks worker --loglevel=info
+
+  beat:
+    build: .
+    container_name: jobpulse_beat
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A workers.tasks beat --loglevel=info
+
+  dashboard:
+    build: .
+    container_name: jobpulse_dash
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=config.settings
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python manage.py runserver 0.0.0.0:8001
+
+volumes:
+  postgres_data:

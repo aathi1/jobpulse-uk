@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Search — JobPulse UK</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; }
+
+        .header { background: #ffffff; padding: 0 40px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .logo { font-size: 20px; font-weight: 800; color: #0ea5e9; }
+        .logo span { color: #64748b; font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .nav a { color: #64748b; text-decoration: none; margin-left: 24px; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 6px; }
+        .nav a:hover { background: #f1f5f9; color: #0ea5e9; }
+        .nav a.active { background: #e0f2fe; color: #0ea5e9; }
+        .live { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #22c55e; font-weight: 600; }
+        .live::before { content: '●'; }
+
+        /* Search bar */
+        .search-bar { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 16px 40px; display: flex; gap: 12px; align-items: center; }
+        .search-input { flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: #f8fafc; color: #1e293b; }
+        .search-input:focus { outline: none; border-color: #0ea5e9; background: #ffffff; }
+        .search-btn { background: #0ea5e9; color: #ffffff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .search-btn:hover { background: #0284c7; }
+        .clear-btn { background: #f1f5f9; color: #64748b; border: none; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+
+        /* Layout */
+        .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 120px); }
+
+        /* Sidebar */
+        .sidebar { background: #ffffff; border-right: 1px solid #e2e8f0; padding: 24px 20px; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+
+        /* Stats boxes */
+        .stat-box { background: #f0f9ff; border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 8px; }
+        .stat-box .num { font-size: 22px; font-weight: 800; color: #0ea5e9; }
+        .stat-box .lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+        /* Quick search links */
+        .quick-link { display: block; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #334155; text-decoration: none; transition: all 0.15s; }
+        .quick-link:hover { background: #f0f9ff; color: #0ea5e9; }
+
+        /* Notice */
+        .notice { background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400e; line-height: 1.5; }
+
+        /* Attribution */
+        .attribution { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; text-align: center; font-size: 12px; color: #64748b; line-height: 1.8; }
+        .attribution a { color: #7c3aed; font-weight: 600; text-decoration: none; }
+
+        /* Main */
+        .main { padding: 24px 32px; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .results-count { font-size: 15px; font-weight: 600; color: #1e293b; }
+        .results-count span { color: #0ea5e9; }
+        .results-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+        /* Job cards — identical to dashboard */
+        .jobs-list { display: flex; flex-direction: column; gap: 10px; }
+        .job-card { background: #ffffff; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; transition: all 0.15s; }
+        .job-card:hover { border-color: #0ea5e9; box-shadow: 0 4px 12px rgba(14,165,233,0.08); transform: translateY(-1px); }
+        .job-card a { text-decoration: none; color: inherit; display: block; }
+        .job-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .job-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+        .job-company { color: #0ea5e9; font-size: 13px; font-weight: 500; margin-top: 3px; }
+        .job-salary { font-size: 14px; font-weight: 700; color: #16a34a; background: #f0fdf4; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+        .job-meta { display: flex; gap: 12px; font-size: 12px; color: #64748b; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.reed { background: #fef3c7; color: #d97706; }
+        .badge.adzuna { background: #ede9fe; color: #7c3aed; }
+
+        /* Empty / error states */
+        .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .empty h3 { font-size: 18px; margin-bottom: 8px; color: #64748b; }
+        .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; color: #dc2626; font-size: 14px; margin-bottom: 20px; }
+
+        /* Hero — shown when no search yet */
+        .hero { background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%); padding: 40px; text-align: center; }
+        .hero h2 { font-size: 24px; font-weight: 800; color: #ffffff; margin-bottom: 8px; }
+        .hero p { color: #bae6fd; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div style="display:flex; align-items:center; gap:16px;">
+        <div class="logo">⚡ JobPulse UK <span>Personal job market intelligence</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:24px;">
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/search/" class="active">🔍 Live Search</a>
+            <a href="/cv-match/">🎯 CV Matcher</a>
+        </nav>
+        <div class="live">Live — updates every 6h</div>
+    </div>
+</div>
+
+{% if not keyword %}
+<!-- Hero shown when no search yet -->
+<div class="hero">
+    <h2>🔍 Search Any UK Job — Live</h2>
+    <p>Search beyond your saved roles — fetch live results from Reed and Adzuna for any keyword</p>
+</div>
+{% endif %}
+
+<!-- Search bar -->
+<form method="GET" action="/search/">
+    <div class="search-bar">
+        <input class="search-input" type="text" name="keyword"
+               placeholder="🔍  Search any role e.g. nurse, teacher, marketing manager, data scientist..."
+               value="{{ keyword }}" autofocus>
+        <button type="submit" class="search-btn">Search Live</button>
+        <a href="/search/" class="clear-btn">Clear</a>
+    </div>
+</form>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        {% if results %}
+        <!-- Result stats -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Results</div>
+            <div class="stat-box">
+                <div class="num">{{ results|length }}</div>
+                <div class="lbl">Live jobs found</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                <div style="background:#fef3c7; border-radius:8px; padding:10px; text-align:center;">
+                    <div style="font-size:18px; font-weight:800; color:#d97706;">{{ reed_count }}</div>
+                    <div style="font-size:11px; color:#64748b;">Reed</div>
+                </div>
+                <div style="background:#ede9fe; border-radius:8px; padding:10px; text-align:center;">
+                    <div style="font-size:18px; font-weight:800; color:#7c3aed;">{{ adzuna_count }}</div>
+                    <div style="font-size:11px; color:#64748b;">Adzuna</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Notice -->
+        <div class="sidebar-section">
+            <div class="notice">
+                ⚡ Live results are fetched directly from Reed and Adzuna APIs in real time. They are not stored in the JobPulse database.
+            </div>
+        </div>
+
+        <!-- Popular searches -->
+        <div class="sidebar-section">
+            <div class="sidebar-title">Popular Searches</div>
+            <a href="/search/?keyword=python+developer" class="quick-link">🐍 Python Developer</a>
+            <a href="/search/?keyword=data+engineer" class="quick-link">📊 Data Engineer</a>
+            <a href="/search/?keyword=mechanical+design+engineer" class="quick-link">⚙️ Mechanical Design Engineer</a>
+            <a href="/search/?keyword=django+developer" class="quick-link">🌐 Django Developer</a>
+            <a href="/search/?keyword=german+speaking" class="quick-link">🇩🇪 German Speaking</a>
+            <a href="/search/?keyword=automation+engineer" class="quick-link">🤖 Automation Engineer</a>
+            <a href="/search/?keyword=catia+engineer" class="quick-link">📐 CATIA Engineer</a>
+            <a href="/search/?keyword=data+scientist" class="quick-link">🔬 Data Scientist</a>
+            <a href="/search/?keyword=devops+engineer" class="quick-link">☁️ DevOps Engineer</a>
+            <a href="/search/?keyword=project+manager" class="quick-link">📋 Project Manager</a>
+        </div>
+
+        <!-- Attribution -->
+        <div class="sidebar-section">
+            <div class="attribution">
+                <a href="https://www.adzuna.co.uk">Jobs</a> by
+                <a href="https://www.adzuna.co.uk">Adzuna</a>
+                <br>
+                Also sourced from
+                <a href="https://www.reed.co.uk" style="color:#d97706;">Reed.co.uk</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+
+        {% if error %}
+        <div class="error-box">{{ error }}</div>
+        {% endif %}
+
+        {% if keyword %}
+
+        {% if results %}
+        <div class="results-header">
+            <div>
+                <div class="results-count">
+                    <span>{{ results|length }}</span> live results for "{{ keyword }}"
+                </div>
+                <div class="results-sub">Fetched directly from Reed + Adzuna — click any job to apply</div>
+            </div>
+        </div>
+
+        <div class="jobs-list">
+            {% for job in results %}
+            <div class="job-card">
+                <a href="{{ job.url }}" target="_blank">
+                    <div class="job-top">
+                        <div>
+                            <div class="job-title">{{ job.title }}</div>
+                            <div class="job-company">{{ job.company }}</div>
+                        </div>
+                        {% if job.salary_min %}
+                        <div class="job-salary">£{{ job.salary_min }} – £{{ job.salary_max }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="job-meta">
+                        <span>📍 {{ job.location }}</span>
+                        <span class="badge {{ job.source }}">{{ job.source }}</span>
+                        <span>{{ job.date_posted }}</span>
+                        <span style="color:#0ea5e9; font-weight:600;">Apply on {{ job.source|title }} →</span>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty">
+            <h3>No results found for "{{ keyword }}"</h3>
+            <p>Try different keywords or check your spelling.</p>
+            <p style="margin-top:12px;">Or try one of the popular searches on the left.</p>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty">
+            <h3>Search any job role across the UK</h3>
+            <p>Not limited to saved roles — search anything from nurse to nuclear engineer.</p>
+            <p style="margin-top:12px; color:#0ea5e9;">Try a popular search from the sidebar →</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>

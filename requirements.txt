@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+psycopg2-binary
+sqlalchemy
+python-dotenv
+requests
+aiohttp
+pandas
+pytest
+httpx
+openpyxl
+beautifulsoup4
+celery
+redis
+django
+whitenoise

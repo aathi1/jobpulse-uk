@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — Aathithyan Venkatesh | JobPulse UK</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; }
+
+        .header { background: #ffffff; padding: 0 40px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .logo { font-size: 20px; font-weight: 800; color: #0ea5e9; }
+        .logo span { color: #64748b; font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .nav a { color: #64748b; text-decoration: none; margin-left: 24px; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 6px; }
+        .nav a:hover { background: #f1f5f9; color: #0ea5e9; }
+        .nav a.active { background: #e0f2fe; color: #0ea5e9; }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%); padding: 60px 40px; text-align: center; }
+        .avatar { width: 90px; height: 90px; background: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .hero h1 { font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 6px; }
+        .hero p { font-size: 15px; color: #bae6fd; margin-bottom: 4px; }
+        .hero-location { font-size: 13px; color: #7dd3fc; margin-bottom: 24px; }
+        .contact-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .contact-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.15s; }
+        .contact-btn.linkedin { background: #0a66c2; color: #ffffff; }
+        .contact-btn.github { background: #24292f; color: #ffffff; }
+        .contact-btn.email { background: #ffffff; color: #0369a1; }
+        .contact-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Content */
+        .content { max-width: 860px; margin: 40px auto; padding: 0 24px 60px; display: flex; flex-direction: column; gap: 24px; }
+
+        /* Cards */
+        .card { background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .card h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0f2fe; display: flex; align-items: center; gap: 10px; }
+        .card p { font-size: 14px; color: #475569; line-height: 1.8; margin-bottom: 12px; }
+        .card p:last-child { margin-bottom: 0; }
+
+        /* Skills */
+        .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-tag { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .skill-python { background: #dbeafe; color: #1d4ed8; }
+        .skill-web { background: #dcfce7; color: #15803d; }
+        .skill-data { background: #fef3c7; color: #d97706; }
+        .skill-devops { background: #ede9fe; color: #7c3aed; }
+        .skill-eng { background: #fce7f3; color: #be185d; }
+        .skill-lang { background: #e0f2fe; color: #0369a1; }
+
+        /* Projects */
+        .project-card { background: #f8fafc; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 14px; transition: all 0.15s; }
+        .project-card:last-child { margin-bottom: 0; }
+        .project-card:hover { border-color: #0ea5e9; box-shadow: 0 4px 12px rgba(14,165,233,0.08); }
+        .project-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .project-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+        .project-links { display: flex; gap: 8px; }
+        .project-link { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 6px; text-decoration: none; }
+        .project-link.live { background: #dcfce7; color: #15803d; }
+        .project-link.github { background: #f1f5f9; color: #334155; }
+        .project-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 10px; }
+        .project-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+        .stack-tag { background: #e0f2fe; color: #0369a1; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+        /* Experience */
+        .exp-item { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; position: relative; padding-left: 20px; }
+        .exp-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .exp-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 8px; height: 8px; background: #0ea5e9; border-radius: 50%; }
+        .exp-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+        .exp-company { color: #0ea5e9; font-size: 14px; font-weight: 600; margin: 3px 0; }
+        .exp-period { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+        .exp-desc { font-size: 13px; color: #64748b; line-height: 1.6; }
+
+        /* Story */
+        .story-highlight { background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; color: #0369a1; line-height: 1.8; font-style: italic; }
+
+        /* Certifications */
+        .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .cert-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; }
+        .cert-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+        .cert-issuer { font-size: 12px; color: #64748b; margin-top: 3px; }
+
+        /* Right to work badge */
+        .rtw-badge { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #15803d; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid #bbf7d0; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div style="display:flex; align-items:center;">
+        <div class="logo">⚡ JobPulse UK <span>Personal job market intelligence</span></div>
+    </div>
+    <nav class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/search/">🔍 Live Search</a>
+        <a href="/cv-match/">🎯 CV Matcher</a>
+        <a href="/about/" class="active">👨‍💻 About</a>
+    </nav>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="avatar">👨‍💻</div>
+    <h1>Aathithyan Venkatesh</h1>
+    <p>Python Developer · Mechanical Engineer · German B1</p>
+    <div class="hero-location">📍 Bournemouth, UK &nbsp;·&nbsp; <span class="rtw-badge">✅ UK Right to Work</span></div>
+    <div class="contact-links">
+        <a href="https://linkedin.com/in/aathi101" target="_blank" class="contact-btn linkedin">
+            💼 LinkedIn
+        </a>
+        <a href="https://github.com/aathi1" target="_blank" class="contact-btn github">
+            🐙 GitHub
+        </a>
+        <a href="mailto:aathithyan1@gmail.com" class="contact-btn email">
+            ✉️ aathithyan1@gmail.com
+        </a>
+    </div>
+</div>
+
+<div class="content">
+
+    <!-- About Me -->
+    <div class="card">
+        <h2>👋 About Me</h2>
+        <p>
+            I'm a self-taught Python developer with a background in mechanical engineering and seven years of professional experience processing German corporate data at Altrata-BoardEx. I moved to the UK in 2026 to pursue a full-time Python or automation engineering role.
+        </p>
+        <p>
+            My journey into Python started entirely on my own initiative — building automation scripts alongside my day job, then progressing to full Django and Flask web applications deployed live in production. I combine an unusual skill set: Python automation, CAD/mechanical engineering, and German B1 language proficiency.
+        </p>
+        <p>
+            I believe in learning by building real things. Every project I've built has solved a genuine problem — including this one.
+        </p>
+    </div>
+
+    <!-- Why I Built JobPulse -->
+    <div class="card">
+        <h2>⚡ Why I Built JobPulse</h2>
+        <p>
+            When I moved to the UK and started applying for jobs, I hit a wall — pure silence. Hundreds of applications, no responses. I had no idea what the market actually wanted, which skills were in demand, or whether my CV was even getting past ATS filters.
+        </p>
+        <div class="story-highlight">
+            "Instead of applying blindly, I built a platform to understand the market. JobPulse now automatically fetches 500+ UK job postings daily, analyses them with Claude AI, and tells me exactly what skills are missing from my CV."
+        </div>
+        <p>
+            JobPulse is the project I built while job hunting — and it's the project that taught me Docker, FastAPI, Celery, Redis, PostgreSQL, GitHub Actions and AWS deployment. It's not just a portfolio piece. I use it every day.
+        </p>
+    </div>
+
+    <!-- Skills -->
+    <div class="card">
+        <h2>🛠️ Technical Skills</h2>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+                <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Python & Backend</div>
+                <div class="skills-grid">
+                    <span class="skill-tag skill-python">Python</span>
+                    <span class="skill-tag skill-python">FastAPI</span>
+                    <span class="skill-tag skill-python">Django</span>
+                    <span class="skill-tag skill-python">Flask</span>
+                    <span class="skill-tag skill-python">asyncio</span>
+                    <span class="skill-tag skill-python">aiohttp</span>
+                    <span class="skill-tag skill-python">REST APIs</span>
+                    <span class="skill-tag skill-python">OOP</span>
+                </div>
+            </div>
+            <div>
+                <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Data & Automation</div>
+                <div class="skills-grid">
+                    <span class="skill-tag skill-data">Pandas</span>
+                    <span class="skill-tag skill-data">BeautifulSoup</span>
+                    <span class="skill-tag skill-data">Selenium</span>
+                    <span class="skill-tag skill-data">Playwright</span>
+                    <span class="skill-tag skill-data">ETL Pipelines</span>
+                    <span class="skill-tag skill-data">JSON/XML</span>
+                    <span class="skill-tag skill-data">openpyxl</span>
+                </div>
+            </div>
+            <div>
+                <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">DevOps & Cloud</div>
+                <div class="skills-grid">
+                    <span class="skill-tag skill-devops">Docker</span>
+                    <span class="skill-tag skill-devops">Docker Compose</span>
+                    <span class="skill-tag skill-devops">PostgreSQL</span>
+                    <span class="skill-tag skill-devops">Redis</span>
+                    <span class="skill-tag skill-devops">Celery</span>
+                    <span class="skill-tag skill-devops">GitHub Actions</span>
+                    <span class="skill-tag skill-devops">AWS</span>
+                    <span class="skill-tag skill-devops">CI/CD</span>
+                    <span class="skill-tag skill-devops">Linux</span>
+                    <span class="skill-tag skill-devops">Git</span>
+                </div>
+            </div>
+            <div>
+                <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">AI & APIs</div>
+                <div class="skills-grid">
+                    <span class="skill-tag skill-python">Claude API</span>
+                    <span class="skill-tag skill-python">GPT-4o</span>
+                    <span class="skill-tag skill-python">LLM Integration</span>
+                    <span class="skill-tag skill-python">Telegram Bot API</span>
+                    <span class="skill-tag skill-python">Binance API</span>
+                    <span class="skill-tag skill-python">Zerodha Kite</span>
+                </div>
+            </div>
+            <div>
+                <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Engineering & CAD</div>
+                <div class="skills-grid">
+                    <span class="skill-tag skill-eng">CATIA V5</span>
+                    <span class="skill-tag skill-eng">SolidWorks</span>
+                    <span class="skill-tag skill-eng">AutoCAD 2D/3D</span>
+                    <span class="skill-tag skill-eng">CREO</span>
+                    <span class="skill-tag skill-eng">ANSYS Fluent</span>
+                    <span class="skill-tag skill-eng">GD&T</span>
+                    <span class="skill-tag skill-eng">FEA</span>
+                    <span class="skill-tag skill-eng">CFD</span>
+                </div>
+            </div>
+            <div>
+                <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Languages</div>
+                <div class="skills-grid">
+                    <span class="skill-tag skill-lang">English (Professional)</span>
+                    <span class="skill-tag skill-lang">German B1 (Goethe-Institut)</span>
+                    <span class="skill-tag skill-lang">Tamil (Native)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="card">
+        <h2>🚀 Projects</h2>
+
+        <div class="project-card">
+            <div class="project-top">
+                <div class="project-title">⚡ JobPulse UK — You're Looking At It</div>
+                <div class="project-links">
+                    <a href="/" class="project-link live">Live</a>
+                    <a href="https://github.com/aathi1/jobpulse-uk" target="_blank" class="project-link github">GitHub</a>
+                </div>
+            </div>
+            <div class="project-desc">
+                Personal UK job market intelligence platform built during my own job search. Automatically tracks 500+ daily postings across Python, engineering and German-speaking roles via Reed and Adzuna APIs. Includes Live Search for any role, AI market analysis via Claude, and CV matching.
+            </div>
+            <div class="project-stack">
+                <span class="stack-tag">FastAPI</span>
+                <span class="stack-tag">Django</span>
+                <span class="stack-tag">PostgreSQL</span>
+                <span class="stack-tag">Docker</span>
+                <span class="stack-tag">Celery</span>
+                <span class="stack-tag">Redis</span>
+                <span class="stack-tag">Claude API</span>
+                <span class="stack-tag">GitHub Actions</span>
+                <span class="stack-tag">AWS</span>
+                <span class="stack-tag">pytest</span>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-top">
+                <div class="project-title">📈 FinBee — NSE Momentum Scanner</div>
+                <div class="project-links">
+                    <a href="https://finbee-showcase.onrender.com" target="_blank" class="project-link live">Live</a>
+                    <a href="https://github.com/aathi1/finbee-showcase" target="_blank" class="project-link github">GitHub</a>
+                </div>
+            </div>
+            <div class="project-desc">
+                Password-protected Django web app scanning 500+ Nifty 500 stocks using RSI, Moving Average and Volume Surge filters. Session-based auth, configurable paper trading engine, Telegram signal delivery and Excel export. Deployed live on Render.
+            </div>
+            <div class="project-stack">
+                <span class="stack-tag">Django</span>
+                <span class="stack-tag">Pandas</span>
+                <span class="stack-tag">yFinance</span>
+                <span class="stack-tag">Telegram API</span>
+                <span class="stack-tag">Render</span>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-top">
+                <div class="project-title">🔌 Component Search Engine</div>
+                <div class="project-links">
+                    <a href="https://github.com/aathi1/component-search-engine" target="_blank" class="project-link github">GitHub</a>
+                </div>
+            </div>
+            <div class="project-desc">
+                Flask web app integrating DigiKey, Mouser, Element14 and TME APIs simultaneously for real-time electronic component pricing and stock data across 4 major distributors. Live production deployment.
+            </div>
+            <div class="project-stack">
+                <span class="stack-tag">Flask</span>
+                <span class="stack-tag">DigiKey API</span>
+                <span class="stack-tag">Mouser API</span>
+                <span class="stack-tag">Element14 API</span>
+                <span class="stack-tag">TME API</span>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-top">
+                <div class="project-title">🕷️ Async Annual Report Scraper</div>
+                <div class="project-links">
+                    <a href="https://github.com/aathi1/annual-report-scraper" target="_blank" class="project-link github">GitHub</a>
+                </div>
+            </div>
+            <div class="project-desc">
+                3-level deep concurrent web crawler with semaphore rate limiting, multilingual keyword matching (EN/DE/FR) and PDF detection. Built to automate German DACH corporate annual report discovery.
+            </div>
+            <div class="project-stack">
+                <span class="stack-tag">asyncio</span>
+                <span class="stack-tag">aiohttp</span>
+                <span class="stack-tag">BeautifulSoup</span>
+                <span class="stack-tag">Python</span>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-top">
+                <div class="project-title">🤖 Stock Market Trading Automation</div>
+                <div class="project-links">
+                    <a href="https://github.com/aathi1/binance-crypto-bot" target="_blank" class="project-link github">GitHub</a>
+                </div>
+            </div>
+            <div class="project-desc">
+                Python trading bots for real-time market data processing, modular strategy execution and automated risk control across NSE and Binance crypto futures markets.
+            </div>
+            <div class="project-stack">
+                <span class="stack-tag">Python</span>
+                <span class="stack-tag">Zerodha Kite API</span>
+                <span class="stack-tag">Binance API</span>
+                <span class="stack-tag">Pandas</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Experience -->
+    <div class="card">
+        <h2>💼 Experience</h2>
+
+        <div class="exp-item">
+            <div class="exp-title">Senior Research Specialist</div>
+            <div class="exp-company">Altrata – BoardEx</div>
+            <div class="exp-period">Dec 2018 – Apr 2026 · Chennai, India · Full-time</div>
+            <div class="exp-desc">
+                Extracted and structured data from 1,200+ German corporate annual reports for international business intelligence databases. Processed financial statements, AGM transcripts, board compositions and shareholder hierarchies from German-language DACH filings. Self-taught Python scripts built independently to automate document discovery — not part of official responsibilities.
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-title">Freelance Python Developer</div>
+            <div class="exp-company">Gurudev Impex (via Ravi Sankar)</div>
+            <div class="exp-period">Jan 2026 – Jun 2026 · Remote · Freelance</div>
+            <div class="exp-desc">
+                Delivered FinBee (Django stock scanner) and Component Search Engine (Flask multi-API platform) — both designed, built and deployed live on Render independently.
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-title">Freelance Python Developer</div>
+            <div class="exp-company">Upwork</div>
+            <div class="exp-period">Apr 2020 – Apr 2022 · Remote</div>
+            <div class="exp-desc">
+                Delivered Python automation for multiple clients — Excel processing, web scraping, MySQL integration, async data pipelines. Built Tkinter GUI apps for data validation.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Education & Certifications -->
+    <div class="card">
+        <h2>🎓 Education & Certifications</h2>
+
+        <div class="exp-item">
+            <div class="exp-title">B.E. Mechanical Engineering</div>
+            <div class="exp-company">Tagore Engineering College, Anna University</div>
+            <div class="exp-period">2012 – 2016 · Chennai, India</div>
+            <div class="exp-desc">Final Year Project: Tensile Stress Analysis in Lap Joint of Glass Carbon Fibre Reinforced Polymer Composite.</div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-title">Master Diploma in Product Design & Analysis</div>
+            <div class="exp-company">CADD Centre Training Services</div>
+            <div class="exp-period">2017 · Chennai, India</div>
+            <div class="exp-desc">CATIA V5, ANSYS, AutoCAD 2D/3D, CREO, GD&T. Project: Computational Analysis of Jet Engine Performance — CATIA + ANSYS Fluent CFD.</div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-title">German Language B1</div>
+            <div class="exp-company">Goethe-Institut</div>
+            <div class="exp-period">2018 · Chennai, India</div>
+        </div>
+
+        <div style="margin-top:20px;">
+            <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">Recent Certifications</div>
+            <div class="cert-grid">
+                <div class="cert-item">
+                    <div class="cert-name">Building with Claude API</div>
+                    <div class="cert-issuer">Anthropic · Apr 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-name">Machine Learning with Python</div>
+                    <div class="cert-issuer">IBM / Coursera · Nov 2025</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-name">Introduction to Git and GitHub</div>
+                    <div class="cert-issuer">Google · Apr 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-name">Database Foundations</div>
+                    <div class="cert-issuer">Oracle · Apr 2026</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-name">REST APIs with Flask & Python</div>
+                    <div class="cert-issuer">Udemy · 2020</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-name">Web Scraping with Python</div>
+                    <div class="cert-issuer">Udemy · 2020</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currently Looking For -->
+    <div class="card">
+        <h2>🎯 Currently Looking For</h2>
+        <p>I'm actively seeking full-time Python or automation engineering roles in the UK. I have full UK right to work — no visa sponsorship required.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:16px;">
+            <span class="skill-tag skill-python">Python Developer</span>
+            <span class="skill-tag skill-python">Automation Engineer</span>
+            <span class="skill-tag skill-python">Backend Developer</span>
+            <span class="skill-tag skill-python">Data Engineer</span>
+            <span class="skill-tag skill-eng">Mechanical Design Engineer</span>
+            <span class="skill-tag skill-lang">German-Speaking Roles</span>
+        </div>
+        <div style="margin-top:20px; padding:16px; background:#f0f9ff; border-radius:8px; border:1px solid #bae6fd;">
+            <div style="font-size:13px; color:#0369a1; line-height:1.7;">
+                📧 <strong>Get in touch:</strong>
+                <a href="mailto:aathithyan1@gmail.com" style="color:#0ea5e9; font-weight:600;">aathithyan1@gmail.com</a>
+                &nbsp;·&nbsp;
+                <a href="https://linkedin.com/in/aathi101" target="_blank" style="color:#0ea5e9; font-weight:600;">LinkedIn</a>
+                &nbsp;·&nbsp;
+                <a href="https://github.com/aathi1" target="_blank" style="color:#0ea5e9; font-weight:600;">GitHub</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<div style="background: #ffffff; border-top: 1px solid #e2e8f0; padding: 24px 40px; text-align:center;">
+    <div style="font-size:12px; color:#94a3b8;">
+        Built by Aathithyan Venkatesh · 2026 ·
+        <a href="https://github.com/aathi1/jobpulse-uk" target="_blank" style="color:#0ea5e9; text-decoration:none;">GitHub</a>
+        · Powered by FastAPI, Django, PostgreSQL, Docker, Celery, Redis, Claude AI
+    </div>
+</div>
+
+</body>
+</html>
