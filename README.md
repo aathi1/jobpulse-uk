@@ -84,6 +84,11 @@ docker compose exec api pytest tests/ -v
 
 Copy .env.example to .env and fill in your keys.
 
+## 🌍 Environment Variables
+
+Copy .env.example to .env and fill in your keys.
+
+```env
 POSTGRES_DB=jobpulse
 POSTGRES_USER=jobpulse_user
 POSTGRES_PASSWORD=your_password
@@ -94,6 +99,7 @@ REED_API_KEY=your_reed_key
 ADZUNA_APP_ID=your_adzuna_id
 ADZUNA_APP_KEY=your_adzuna_key
 ANTHROPIC_API_KEY=your_anthropic_key
+```
 
 ## 👨‍💻 About The Builder
 
