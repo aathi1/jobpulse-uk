@@ -81,6 +81,26 @@
 
         /* Right to work badge */
         .rtw-badge { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #15803d; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid #bbf7d0; }
+
+        @media (max-width: 768px) {
+            .header { padding: 10px 16px; height: auto; flex-direction: column; align-items: flex-start; gap: 8px; }
+            .logo { font-size: 16px; }
+            .logo span { display: none; }
+            .nav { display: flex; flex-wrap: wrap; gap: 4px; }
+            .nav a { margin-left: 0; font-size: 11px; padding: 4px 8px; }
+
+            .hero { padding: 30px 16px; }
+            .hero h1 { font-size: 22px; }
+            .contact-links { flex-direction: column; align-items: center; }
+            .contact-btn { width: 200px; text-align: center; justify-content: center; }
+
+            .content { padding: 0 16px 40px; margin: 20px auto; }
+            .card { padding: 20px; }
+            .cert-grid { grid-template-columns: 1fr; }
+            .skills-grid { gap: 6px; }
+            .project-top { flex-direction: column; gap: 8px; }
+            .project-links { flex-wrap: wrap; }
+        }        
     </style>
 </head>
 <body>

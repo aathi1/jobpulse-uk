@@ -138,9 +138,32 @@ def job_detail(request, job_id):
     return render(request, 'jobs_board/detail.html', {'job': job})
 
 
+
+CV_MATCH_PASSWORD = os.getenv("CV_MATCH_PASSWORD", "Jobsound2026")
+
 @csrf_exempt
 def cv_match(request):
-    if request.method == 'POST':
+    """CV matching page — password protected."""
+
+    # Check session for auth
+    if not request.session.get('cv_auth'):
+        if request.method == 'POST' and request.POST.get('password'):
+            if request.POST.get('password') == CV_MATCH_PASSWORD:
+                request.session['cv_auth'] = True
+            else:
+                return render(request, 'jobs_board/cv_match.html', {
+                    'show_login': True,
+                    'error': 'Incorrect password.',
+                    'limit': 10,
+                })
+        else:
+            return render(request, 'jobs_board/cv_match.html', {
+                'show_login': True,
+                'limit': 10,
+            })
+
+    # Authenticated — handle CV match
+    if request.method == 'POST' and request.POST.get('cv_text'):
         cv_text = request.POST.get('cv_text', '')
         limit = request.POST.get('limit', '10')
 
@@ -150,12 +173,6 @@ def cv_match(request):
             if limit > 50: limit = 50
         except ValueError:
             limit = 10
-
-        if not cv_text:
-            return render(request, 'jobs_board/cv_match.html', {
-                'error': 'Please paste your CV text.',
-                'limit': limit,
-            })
 
         try:
             admin_key = os.getenv("ADMIN_API_KEY", "")
@@ -176,7 +193,6 @@ def cv_match(request):
         })
 
     return render(request, 'jobs_board/cv_match.html', {'limit': 10})
-
 
 
 def live_search(request):

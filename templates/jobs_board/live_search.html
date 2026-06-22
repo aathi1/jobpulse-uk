@@ -78,23 +78,66 @@
         .hero { background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%); padding: 40px; text-align: center; }
         .hero h2 { font-size: 24px; font-weight: 800; color: #ffffff; margin-bottom: 8px; }
         .hero p { color: #bae6fd; font-size: 14px; }
+        @media (max-width: 768px) {
+            .header { 
+                padding: 8px 12px; 
+                height: auto; 
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .logo { font-size: 15px; flex: 1; }
+            .logo span { display: none; }
+            .nav { 
+                display: flex; 
+                flex-wrap: nowrap;
+                gap: 2px;
+                overflow-x: auto;
+            }
+            .nav a { 
+                margin-left: 0; 
+                font-size: 11px; 
+                padding: 4px 6px;
+                white-space: nowrap;
+            }
+            .live { display: none; }
+
+            .search-hero { padding: 20px 16px; }
+            .search-hero h2 { font-size: 16px; }
+            .search-form { flex-direction: column; gap: 8px; }
+            .search-form input { width: 100%; }
+            .search-form button { width: 100%; }
+
+            .search-bar { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+            .search-input { width: 100%; }
+            .clear-btn { width: 100%; text-align: center; }
+
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { 
+                position: static; 
+                height: auto; 
+                border-right: none; 
+                border-bottom: 1px solid #e2e8f0; 
+                padding: 12px;
+                display: none;
+            }
+            .main { padding: 12px; }
+
+            .job-top { flex-direction: column; gap: 8px; }
+            .job-salary { align-self: flex-start; }
+        }
     </style>
 </head>
 <body>
 
 <!-- Header -->
 <div class="header">
-    <div style="display:flex; align-items:center; gap:16px;">
-        <div class="logo">⚡ JobPulse UK <span>Personal job market intelligence</span></div>
-    </div>
-    <div style="display:flex; align-items:center; gap:24px;">
-        <nav class="nav">
-            <a href="/">Dashboard</a>
-            <a href="/search/" class="active">🔍 Live Search</a>
-            <a href="/cv-match/">🎯 CV Matcher</a>
-        </nav>
-        <div class="live">Live — updates every 6h</div>
-    </div>
+    <div class="logo">⚡ JobPulse UK <span>Personal job market intelligence</span></div>
+    <nav class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/search/" class="active">🔍 Search</a>
+        <a href="/cv-match/">🎯 CV Matcher</a>
+        <a href="/about/">👨‍💻 About</a>
+    </nav>
 </div>
 
 {% if not keyword %}

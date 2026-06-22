@@ -37,7 +37,7 @@ def health():
 # ── Pipeline ───────────────────────────────────────────────────────────────────
 
 @app.post("/pipeline/run")
-def run_pipeline():
+def run_pipeline(admin=Depends(verify_admin)):
     """Trigger the ETL pipeline as a Celery background task."""
     from workers.tasks import run_pipeline as celery_pipeline
     task = celery_pipeline.delay()
