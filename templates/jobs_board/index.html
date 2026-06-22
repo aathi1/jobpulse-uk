@@ -250,7 +250,8 @@
                 <span>🤖 Market Summary</span>
                 <span>▼</span>
             </button>
-            <div class="ai-summary" id="ai-summary-content" data-content="{{ latest_summary.content|escapejs }}"></div>
+            <div class="ai-summary" id="ai-summary-content"></div>
+            {{ latest_summary.content|json_script:"ai-raw-content" }}
         </div>
         {% endif %}
 
@@ -379,21 +380,40 @@ function toggleAI(btn) {
     btn.querySelector('span:last-child').textContent = content.classList.contains('open') ? '▲' : '▼';
 }
 
-// Render AI summary markdown properly
+const rawScript = document.getElementById('ai-raw-content');
 const summaryEl = document.getElementById('ai-summary-content');
-if (summaryEl) {
-    const raw = summaryEl.getAttribute('data-content');
-    // Convert markdown to readable HTML
+
+if (rawScript && summaryEl) {
+    const raw = JSON.parse(rawScript.textContent);
     const html = raw
-        .replace(/### (.*?)(\n|$)/g, '<h4 style="color:#0369a1;margin:12px 0 6px;font-size:13px;">$1</h4>')
-        .replace(/## (.*?)(\n|$)/g, '<h3 style="color:#0369a1;margin:14px 0 8px;font-size:14px;font-weight:700;">$1</h3>')
-        .replace(/# (.*?)(\n|$)/g, '<h2 style="color:#0369a1;margin:16px 0 8px;font-size:15px;font-weight:800;">$1</h2>')
+        // Remove markdown tables entirely
+        .replace(/\|.*\|/g, '')
+        // Remove table separator lines
+        .replace(/^[\s\-\|]+$/gm, '')
+        // Headers
+        .replace(/^### (.*?)$/gm, '<h4>$1</h4>')
+        .replace(/^## (.*?)$/gm, '<h3>$1</h3>')
+        .replace(/^# (.*?)$/gm, '<h2>$1</h2>')
+        // Bold and italic
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Horizontal rules
+        .replace(/^---$/gm, '<hr>')
+        // Numbered lists
+        .replace(/^\d+\.\s+(.*?)$/gm, '<p>• $1</p>')
+        // Remove blockquotes
+        .replace(/^>\s*(.*?)$/gm, '<p style="color:#64748b;font-style:italic;">$1</p>')
+        // Remove emoji pin lines — convert to bold headers
+        .replace(/📌\s*(.*?)$/gm, '<strong>$1</strong>')
+        // Multiple blank lines → single break
+        .replace(/\n{3,}/g, '\n\n')
+        // Double newlines → paragraph break
         .replace(/\n\n/g, '<br><br>')
-        .replace(/\n/g, '<br>')
-        .replace(/\|(.+)\|/g, '') // remove markdown tables
-        .replace(/---/g, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0;">');
+        // Single newlines → space
+        .replace(/\n/g, ' ')
+        // Clean up empty paragraphs
+        .replace(/<br><br>\s*<br><br>/g, '<br><br>');
+
     summaryEl.innerHTML = html;
 }
 </script>

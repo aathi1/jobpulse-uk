@@ -70,9 +70,16 @@ Provide a structured analysis with these sections:
 4. SALARY INSIGHTS (typical ranges for different role levels)
 5. NOTABLE TRENDS (2-3 interesting patterns you notice)
 
+IMPORTANT FORMATTING RULES:
+- Do NOT use markdown tables
+- Do NOT use | characters
+- Use plain numbered or bulleted lists only
+- Keep each section concise
+- No horizontal rules between sections
+
 Be specific and data-driven. Focus on Python, automation, mechanical engineering, and German-speaking roles."""
 
-    return call_claude(prompt, max_tokens=800)
+    return call_claude(prompt, max_tokens=1500)
 
 
 def extract_skills_from_jobs(jobs: list[dict]) -> dict:
